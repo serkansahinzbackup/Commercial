@@ -1,0 +1,13 @@
+server:
+  port: 8075
+
+spring:
+  datasource:
+    username: admin
+    password: root
+    url: jdbc:postgresql://localhost:5432/commercialDB
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
