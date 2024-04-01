@@ -3,7 +3,6 @@ package com.commercial.controller;
 import com.commercial.dto.request.ProductRequestDto;
 import com.commercial.dto.response.ProductResponseDto;
 import com.commercial.exception.ResourceNotFoundException;
-import com.commercial.repository.entity.Product;
 import com.commercial.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,16 +22,17 @@ public class ProductController {
         return ResponseEntity.ok(productService.findAllProducts());
 
     }
+
+    @PostMapping("create_product")
+    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductRequestDto productDto){
+        return ResponseEntity.ok(productService.createProduct(productDto));
+    }
+
     @GetMapping("/get_product_by_id"+"/{id}")
     public ResponseEntity<ProductResponseDto> findProductById(@PathVariable Long id) throws ResourceNotFoundException{
 
         return ResponseEntity.ok(productService.findProductById(id));
 
-    }
-
-    @PostMapping("create_product")
-    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductRequestDto productDto){
-        return ResponseEntity.ok(productService.createProduct(productDto));
     }
 
     @PutMapping("update_product"+"/{id}")
@@ -41,7 +41,7 @@ public class ProductController {
     }
 
     @DeleteMapping("delete_product"+"/{id}")
-    public ResponseEntity<String> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException { // todo deletebyid yapılmalı mı
+    public ResponseEntity<String> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException {
         return ResponseEntity.ok(productService.deleteProductById(id));
     }
 

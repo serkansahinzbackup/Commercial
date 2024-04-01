@@ -1,0 +1,35 @@
+-This is a Java Spring Boot Framework backend project with Layered Architecture.(JDK version 17)
+-You can see Controller, Service, and Repository(DAO) Layers.
+-Client ↔ ︎Controller ↔ Service ↔ Repository(DAO) ↔ PostgreSQL
+-PostgreSQL has been used and can be setup in Docker.
+-Given entities are Cart, CartItem, Customer, Order, Product (BaseEntity used to eliminate code repetition thus inheritance and composition has been applied)
+-One can benefit from CRUD(Create, Read, Update,Delete) operations thanks to RestAPI
+-Swagger is the tool to simulate all operations(one can reach operations thanks to end points)(openapi-starter-webmvc-ui)
+-Data Transfer Object (Dto) has been used so that some important fields/information can be hidden from the client
+-Mapstruct has been used as a third party tool
+
+How to Run the Project
+-To run this project first run docker-compose.yml file, this will run the PostgreSQL
+-login with username:admin, password:root to login PostgreSQL, create database:commercialDB
+-please dont forget to check maven dependencies before running the application(clean and then package)
+
+GitHub: https://github.com/serkansahinzbackup/EnocaMulakatSoru5.git
+
+How to use is swagger-ui
+go to http://localhost:8075/swagger-ui/index.html#/
+
+- create some products by using create_product
+- create some customers by using add_customer
+- create an empty cart by create_empty_cart/{customerId}
+- add products to created empty cart by add_product_to_cart(you need cartID, productId, quantity)
+- create order by place_order (you will see that all items in the cart will be transferred into the order and cart will be empty)
+
+Product, one can do all CRUD transactions for products
+Cart, one can do CRU transactions for cart, empty cart, remove product, update cartItem
+Order, one can only place order and get orders by code and customerID
+Customer, one can only add customer
+
+
+
+
+-many thanks for your time

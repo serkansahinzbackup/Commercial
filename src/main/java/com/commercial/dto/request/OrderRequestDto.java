@@ -1,6 +1,5 @@
 package com.commercial.dto.request;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

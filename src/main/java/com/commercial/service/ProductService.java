@@ -19,9 +19,9 @@ public class ProductService {
     private final IProductRepository productRepository;
 
     public List<ProductResponseDto> findAllProducts() {
-        List<Product> productList= productRepository.findAll();
+        List<Product> productList = productRepository.findAll();
 
-        List<ProductResponseDto> productResponseDtoList=new ArrayList<>();
+        List<ProductResponseDto> productResponseDtoList = new ArrayList<>();
         for (int i = 0; i < productList.size(); i++) {
 
             ProductResponseDto productResponseDto = IProductMapper.INSTANCE.toProductResponseDto(productList.get(i));
@@ -32,7 +32,7 @@ public class ProductService {
 
     public ProductResponseDto findProductById(Long id) throws ResourceNotFoundException {
 
-         Product product=productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("PRODUCT NOT FOUND"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("PRODUCT NOT FOUND"));
 
         return IProductMapper.INSTANCE.toProductResponseDto(product);
     }
@@ -41,28 +41,26 @@ public class ProductService {
 
         Product product = IProductMapper.INSTANCE.toProduct(productRequestDto);
 
-         productRepository.save(product);
+        productRepository.save(product);
         return IProductMapper.INSTANCE.toProductResponseDto(product);
     }
 
     public ProductResponseDto updateProductById(Long id, ProductRequestDto productRequestDto) throws ResourceNotFoundException {
-        Product product = productRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Product not found ID: "+ id));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found ID: " + id));
 
-        product.setName(productRequestDto.getName());
         product.setPrice(productRequestDto.getPrice());
+        product.setName(productRequestDto.getName());
         product.setStock(productRequestDto.getStock());
 
-         productRepository.save(product);
+        productRepository.save(product);
         return IProductMapper.INSTANCE.toProductResponseDto(product);
     }
 
     public String deleteProductById(Long id) throws ResourceNotFoundException {
-        Product product=productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found ID: " + id));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found ID: " + id));
 
-         productRepository.deleteById(product.getId());
+        productRepository.deleteById(product.getId());
         return product.getId() + " " + product.getName() + " has been deleted";
 
     }
-
-
 }

@@ -1,22 +1,29 @@
 package com.commercial.dto.response;
 
 import com.commercial.repository.entity.CartItem;
+import com.commercial.repository.entity.Customer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CartResponseDto {
 
-    private Long id;
+public class OrderResponseDetailDto {
 
-    private List<CartItem> cartItems;
+    private String productName;
 
-    private Double totalPrice;
+    private Double currentPrice;
+
+    private Double previousPrice;
+
+    private LocalDateTime purchasedDate;
+
 }

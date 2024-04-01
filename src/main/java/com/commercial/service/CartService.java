@@ -3,6 +3,7 @@ package com.commercial.service;
 import com.commercial.dto.request.CartRequestDto;
 import com.commercial.dto.response.CartResponseDto;
 import com.commercial.exception.ResourceNotFoundException;
+import com.commercial.exception.StockException;
 import com.commercial.mapper.ICartMapper;
 import com.commercial.repository.ICartItemRepository;
 import com.commercial.repository.ICartRepository;
@@ -35,28 +36,6 @@ public class CartService {
         return ICartMapper.INSTANCE.toCartResponseDto(cart.get());
     }
 
-//    public CartResponseDto createCart(CartRequestDto cartRequestDto) throws ResourceNotFoundException{
-//
-//        Customer customer =customerRepository.findById(cartRequestDto.getCustomerId()).orElseThrow(()->new ResourceNotFoundException("Cusmotmer not found"));
-//
-//        double totalPrice=0.0;
-//
-//        List<CartItem> cartItemList=new ArrayList<>();
-//
-//        for (int i = 0; i < cartRequestDto.getCartItemIds().size(); i++) {
-//            CartItem cartItem = cartItemRepository.findById(cartRequestDto.getCartItemIds().get(i)).orElseThrow(()->new ResourceNotFoundException("Cartitem not found"));
-//            cartItemList.add(cartItem);
-//            totalPrice+= (cartItem.getQuantity() * cartItem.getProduct().getPrice());
-//        }
-//
-//        Cart cart = new Cart();
-//        cart.setCartItems(cartItemList);
-//        cart.setTotalPrice(totalPrice);
-//
-//        cartRepository.save(cart);
-//        return ICartMapper.INSTANCE.toCartResponseDto(cart);
-//    }
-
     public CartResponseDto createEmptyCart(Long customerId) throws ResourceNotFoundException {
 
         Customer customer = customerRepository.findById(customerId).orElseThrow(()-> new ResourceNotFoundException("Customer not found"));
@@ -77,13 +56,19 @@ public class CartService {
 
     }
 
-    public CartResponseDto addProductToCart(Long cartId, Long productId, Integer quantity) throws ResourceNotFoundException {
+    public CartResponseDto addProductToCart(Long cartId, Long productId, Integer quantity) throws ResourceNotFoundException, StockException {
 
         Cart cart=cartRepository.findById(cartId).orElseThrow(()->new ResourceNotFoundException("Cart not found"));
 
         Product product = productRepository.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product not found"));
 
-        CartItem cartItem = CartItem.builder().product(product).quantity(quantity).build();
+        if(product.getStock()>=quantity){
+            product.setStock(product.getStock()-quantity);
+            productRepository.save(product);
+        } else {
+            throw new StockException(product.getName()+" insufficient in the stock, remaining stock: " + product.getStock());
+        }
+        CartItem cartItem = CartItem.builder().product(product).quantity(quantity).price(product.getPrice()).build();
 
         cartItem = cartItemRepository.save(cartItem);
 
@@ -145,6 +130,41 @@ public class CartService {
         return ICartMapper.INSTANCE.toCartResponseDto(cart.get());
     }
 
+    public CartResponseDto updateCartItem(Long cartItemId, Integer quantity) throws ResourceNotFoundException, StockException{
+
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElseThrow(()-> new ResourceNotFoundException("CartItem not found"));
+
+        Product product = cartItem.getProduct();
+
+        Integer stock=cartItem.getQuantity() + cartItem.getProduct().getStock();
+
+        if (stock >= quantity){
+            product.setStock(stock-quantity);
+            productRepository.save(product);
+        } else {
+            throw new StockException(product.getName()+" insufficient in the stock, remaining stock: " + stock);
+        }
+
+        cartItem.setQuantity(quantity);
+
+        cartItemRepository.save(cartItem);
+
+        Cart cart = cartRepository.findAll().stream().
+                filter(a->a.getCartItems().
+                        contains(cartItem)).
+                findFirst().get();
+
+        double totalPrice=0.0;
+
+        totalPrice = cart.getCartItems().stream()
+                .mapToDouble(a -> (a.getQuantity() * a.getProduct().getPrice())).sum();
+        cart.setTotalPrice(totalPrice);
+
+        cartRepository.save(cart);
+
+        return ICartMapper.INSTANCE.toCartResponseDto(cart);
+    }
+
 
     public String emptyCartByID(Long cartId) throws ResourceNotFoundException{
         Optional<Cart> cart = cartRepository.findById(cartId);
@@ -162,7 +182,6 @@ public class CartService {
 
         return cart.get().getId()+ " id numbered Cart has been emptied successfully";
     }
-
 
 
 }

@@ -1,11 +1,10 @@
 package com.commercial.controller;
 
 import com.commercial.dto.request.CartRequestDto;
-import com.commercial.dto.request.ProductRequestDto;
 import com.commercial.dto.response.CartResponseDto;
 import com.commercial.exception.ResourceNotFoundException;
+import com.commercial.exception.StockException;
 import com.commercial.service.CartService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,8 +32,13 @@ public class CartController {
     }
 
     @PutMapping("add_product_to_cart")
-    public ResponseEntity<CartResponseDto> addProductToCart(@RequestParam Long cartId, @RequestParam Long productId, @RequestParam Integer quantity) throws ResourceNotFoundException{
+    public ResponseEntity<CartResponseDto> addProductToCart(@RequestParam Long cartId, @RequestParam Long productId, @RequestParam Integer quantity) throws ResourceNotFoundException, StockException {
         return ResponseEntity.ok(cartService.addProductToCart(cartId, productId, quantity));
+    }
+
+    @PutMapping("update_cartItem")
+    public ResponseEntity<CartResponseDto> updateCartItem(@RequestParam Long cartItemId, @RequestParam Integer quantity) throws ResourceNotFoundException, StockException {
+        return ResponseEntity.ok(cartService.updateCartItem(cartItemId, quantity));
     }
     @PutMapping("remove_product_from_cart")
     public ResponseEntity<CartResponseDto> removeProductFromCart(@RequestParam Long cartId, @RequestParam Long cartItemId) throws ResourceNotFoundException{
